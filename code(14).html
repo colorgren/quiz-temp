@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culture Quiz</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif; /* Changed font for better readability */
+            background-color: #4B0082; /* Dark purple from PDF */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .quiz-container {
+            background-color: #8B0000; /* Maroon from PDF */
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #start-screen h1 {
+             color: #FFD700; /* Gold from PDF */
+             margin-bottom: 20px;
+        }
+
+        #start-screen button {
+            background-color: #FFD700; /* Gold from PDF */
+            color: #8B0000; /* Maroon from PDF */
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #start-screen button:hover {
+            background-color: #DAA520; /* Darker Gold */
+        }
+
+        #quiz-screen {
+            display: none; /* Hidden by default */
+        }
+
+        #question-counter {
+            font-size: 1.2em;
+            color: #FFD700; /* Gold */
+            margin-bottom: 15px;
+        }
+
+        #question-text {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-button {
+            background-color: #4B0082; /* Dark purple */
+            color: #fff;
+            border: 2px solid #FFD700; /* Gold border */
+            padding: 15px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            text-align: left;
+        }
+
+        .option-button:hover {
+            background-color: #6a0dad; /* Lighter purple */
+            border-color: #fff;
+        }
+
+        .option-button.correct {
+            background-color: #32CD32; /* LimeGreen - Success */
+            border-color: #fff;
+        }
+
+        .option-button.incorrect {
+            background-color: #DC143C; /* Crimson - Error */
+            border-color: #fff;
+        }
+
+        #feedback {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            min-height: 1.5em; /* Reserve space */
+        }
+
+        #score {
+            font-size: 1.3em;
+            color: #FFD700; /* Gold */
+            margin-top: 20px;
+        }
+
+        #end-screen {
+            display: none; /* Hidden by default */
+        }
+
+        #end-screen h2 {
+            color: #FFD700; /* Gold */
+            margin-bottom: 15px;
+        }
+
+        #end-screen button {
+            background-color: #FFD700; /* Gold */
+            color: #8B0000; /* Maroon */
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+         #end-screen button:hover {
+            background-color: #DAA520; /* Darker Gold */
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+
+        <div id="start-screen">
+            <h1>Arising Cultures Quiz</h1>
+            <p>Test your knowledge based on the presentation!</p>
+            <button id="start-button">Start Quiz</button>
+        </div>
+
+        <div id="quiz-screen">
+            <div id="question-counter">Question 1 of X</div>
+            <h2 id="question-text"></h2>
+            <div id="options-container">
+                <!-- Options will be loaded here by JavaScript -->
+            </div>
+            <div id="feedback"></div>
+            <div id="score">Score: 0</div>
+        </div>
+
+        <div id="end-screen">
+            <h2>Quiz Complete!</h2>
+            <div id="final-score"></div>
+            <button id="restart-button">Play Again</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Quiz questions data
+        const questions = [
+            {
+                question: "According to Hofstede (1980), Culture is defined as:",
+                options: ["Individual preferences", "Geographic location", "The collective programming of the mind", "Economic status"],
+                correctAnswerIndex: 2
+            },
+             {
+                question: "Ritzer & Malone (2001) describe Globalization as the rapid global flows of:",
+                options: ["Money and resources", "People, goods, information, and culture", "Technologies and inventions", "Political ideas only"],
+                correctAnswerIndex: 1
+            },
+            {
+                question: "Cultural Hybridization refers to:",
+                options: ["Isolating cultures from each other", "The mixing and blending of different cultural traits", "The dominance of one culture over others", "The loss of all cultural identity"],
+                correctAnswerIndex: 1
+            },
+            {
+                question: "Which of the following is mentioned as a benefit of Cultural Hybridization on Page 14?",
+                options: ["Isolation", "Uniformity", "Adaptability", "Resistance to change"],
+                correctAnswerIndex: 2
+            },
+            {
+                question: "Multiculturalism is defined as the recognition, inclusion, and appreciation of:",
+                options: ["Only the majority culture", "Different cultural backgrounds", "Economic differences only", "Political ideologies"],
+                correctAnswerIndex: 1
+            },
+            {
+                question: "A characteristic of a multicultural society, as described, is that all cultures are:",
+                options: ["The same", "Ignored", "Respected", "Separate"],
+                correctAnswerIndex: 2
+            },
+            {
+                question: "Popular Culture is described as shared experiences enjoyed by:",
+                options: ["A small elite group", "Government officials", "Academics and researchers", "The masses"],
+                correctAnswerIndex: 3
+            },
+            {
+                question: "The 'Bread and Circuses' concept, related to Pop Culture, suggests that:",
+                options: ["Pop Culture promotes healthy eating", "Pop Culture is used to distract people from issues", "Pop Culture is only about entertainment for the rich", "Pop Culture is a vital source of news"],
+                correctAnswerIndex: 1
+            },
+            {
+                question: "High Culture is often associated with which group?",
+                options: ["The masses", "Elite groups", "Indigenous communities", "Younger generations"],
+                correctAnswerIndex: 1
+            },
+            {
+                question: "Traditional culture encompasses customs, knowledge, and practices passed down through:",
+                options: ["Modern education systems only", "Digital media platforms", "Generations", "Political decrees"],
+                correctAnswerIndex: 2
+            },
+             {
+                question: "According to the presentation, a reason for the resurgence of Traditional Culture is:",
+                options: ["A decline in technology", "Desire to preserve identity amidst global influences", "Government mandates against globalization", "Increased isolation from other cultures"],
+                correctAnswerIndex: 1
+            },
+             {
+                question: "What role does Digital Influence play in the resurgence of Traditional Culture?",
+                options: ["It makes it inaccessible and outdated.", "It makes it accessible and trendy.", "It leads to its complete disappearance.", "It only benefits commercialization."],
+                correctAnswerIndex: 1
+            },
+            {
+                question: "Cultural Appropriation vs. Appreciation is mentioned as a major challenge to:",
+                options: ["Globalization", "Popular Culture", "The resurgence of Traditional Culture", "High Culture"],
+                correctAnswerIndex: 2
+            },
+            {
+                question: "Promoting Diversity and Understanding is listed as an importance of:",
+                options: ["Cultural Appropriation", "Globalization", "Consumer Culture", "Resurgence of Traditional Culture"],
+                correctAnswerIndex: 3
+            }
+            // Add all other objective questions here following this format
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const endScreen = document.getElementById('end-screen');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const questionCounter = document.getElementById('question-counter');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackElement = document.getElementById('feedback');
+        const scoreElement = document.getElementById('score');
+        const finalScoreElement = document.getElementById('final-score');
+
+        // Fisher-Yates (aka Knuth) Shuffle
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
+        function startQuiz() {
+            score = 0;
+            currentQuestionIndex = 0;
+            shuffledQuestions = shuffleArray([...questions]); // Shuffle a copy
+            scoreElement.textContent = 'Score: 0';
+            feedbackElement.textContent = '';
+            startScreen.style.display = 'none';
+            endScreen.style.display = 'none';
+            quizScreen.style.display = 'block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
+            questionText.textContent = currentQuestion.question;
+            optionsContainer.innerHTML = ''; // Clear previous options
+            feedbackElement.textContent = ''; // Clear previous feedback
+
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.classList.add('option-button');
+                button.textContent = option;
+                button.addEventListener('click', () => checkAnswer(index));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedIndex) {
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            const optionButtons = optionsContainer.querySelectorAll('.option-button');
+
+            // Disable buttons after click
+            optionButtons.forEach(button => button.disabled = true);
+
+            if (selectedIndex === currentQuestion.correctAnswerIndex) {
+                score++;
+                feedbackElement.textContent = 'Correct!';
+                feedbackElement.style.color = '#32CD32'; // LimeGreen
+                optionButtons[selectedIndex].classList.add('correct');
+            } else {
+                feedbackElement.textContent = 'Incorrect.';
+                feedbackElement.style.color = '#DC143C'; // Crimson
+                optionButtons[selectedIndex].classList.add('incorrect');
+                // Optionally highlight the correct answer
+                 optionButtons[currentQuestion.correctAnswerIndex].classList.add('correct');
+            }
+
+            scoreElement.textContent = `Score: ${score}`;
+
+            // Move to the next question after a delay
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < shuffledQuestions.length) {
+                    loadQuestion();
+                     // Re-enable buttons for the next question
+                    optionButtons.forEach(button => button.disabled = false);
+                } else {
+                    endQuiz();
+                }
+            }, 1500); // Wait 1.5 seconds before moving on
+        }
+
+        function endQuiz() {
+            quizScreen.style.display = 'none';
+            endScreen.style.display = 'block';
+            finalScoreElement.textContent = `Your final score is ${score} out of ${shuffledQuestions.length}`;
+        }
+
+        // Event listeners for start and restart buttons
+        startButton.addEventListener('click', startQuiz);
+        restartButton.addEventListener('click', startQuiz);
+
+        // Initialize the start screen on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            startScreen.style.display = 'block';
+            quizScreen.style.display = 'none';
+            endScreen.style.display = 'none';
+        });
+
+    </script>
+</body>
+</html>
